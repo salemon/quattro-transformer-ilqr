@@ -1,8 +1,7 @@
-import os
-import pickle
 import numpy as np
 from quadrotor_dynamics import QuadrotorDynamics
-from quattro_ilqr_tf.quattro_ilqr_tf import iLQR_TF  # Provided iLQR implementation
+
+from quattro_ilqr_tf.quattro_ilqr_tf import iLQR_TF
 
 class QuadrotorMPC:
     """
@@ -34,6 +33,7 @@ class QuadrotorMPC:
         # For hover, we desire the quadrotor to be at x=0, y=0, z=0.5 with zero velocities and zero angles.
         self.x_ref = np.zeros(12)
         self.x_ref[2] = 0.5
+        
 
         # Define cost matrices (tune these as needed)
         # For example, penalize position error, velocity, orientation, and angular rates.
@@ -50,9 +50,6 @@ class QuadrotorMPC:
 
         # iLQR transformer model (if any)
         self.transformer_model = transformer_model
-        self.en_tf = False
-        if self.transformer_model is not None:
-            self.en_tf = True
 
         # Create iLQR solver instance
         self.ilqr = iLQR_TF(
@@ -63,8 +60,10 @@ class QuadrotorMPC:
             u_init=self.u_init,
             horizon=horizon,
             tf=self.transformer_model,
-            en_tf=self.en_tf
         )
+        offset = self.ilqr.get_state_offset()
+        offset[2] = 0.5
+        self.ilqr.set_state_offset(offset)
 
     def discrete_dynamics(self, x, u):
         """

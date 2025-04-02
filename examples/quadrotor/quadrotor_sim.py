@@ -5,6 +5,10 @@ import glfw
 import pickle
 import matplotlib.pyplot as plt
 
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
 from quadrotor_wrapper import QuadrotorWrapper
 from quadrotor_mpc import QuadrotorMPC
 
@@ -238,8 +242,9 @@ if __name__ == "__main__":
     model_wrapper.device = "cpu"
 
     # Load the model
-    model_dir = "/Users/justin/PycharmProjects/cart-pole-transformer/idea3_k_pred_quadrotor/" \
-                "transformer/dec3_dmodel128_nhead4_ff512_drop0.1_epoch200_promptlen1_616.2k"
+    
+    model_dir = "/Users/justin/PycharmProjects/quattro-transformer-ilqr/examples/quadrotor/" \
+                "dec3_dmodel128_nhead4_ff512_drop0.1_epoch200_promptlen1_616.2k"
     model_wrapper.load(model_dir)
 
     # Example: define a sweep of initial conditions.
@@ -248,8 +253,8 @@ if __name__ == "__main__":
     ]
     
     logs = run_quadrotor_sim(
-        model_path="./asset/skydio_x2/scene.xml",
-        use_gui=False,
+        model_path="examples/asset/skydio_x2/scene.xml",
+        use_gui=True,
         sweep_inits=init_conditions,
         sim_steps=10000,
         horizon=50,
