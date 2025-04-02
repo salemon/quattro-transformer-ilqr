@@ -1,0 +1,72 @@
+<mujoco model="SymmetricQuadrotor">
+  <compiler autolimits="true"/>
+  <option timestep="0.01" density="1.225" viscosity="1.8e-5"/>
+
+  <default>
+    <default class="quad">
+      <!-- Body defaults: zero mass at the default level so that masses come from individual geoms -->
+      <geom mass="0"/>
+      <motor ctrlrange="0 13"/>
+      <!-- Use simple primitives for visuals -->
+      <default class="visual">
+        <geom type="sphere" size="0.05" contype="0" conaffinity="0"/>
+      </default>
+      <default class="collision">
+        <geom type="box" size="0.05 0.05 0.02"/>
+        <default class="rotor">
+          <geom type="ellipsoid" size="0.05 0.05 0.01"/>
+        </default>
+      </default>
+      <site/>
+    </default>
+  </default>
+
+  <!-- No asset section is used; all geometry is built from primitives -->
+
+  <worldbody>
+    <light name="spotlight" mode="targetbodycom" target="x2" pos="0 -1 2"/>
+    <body name="x2" pos="0 0 0.1" childclass="quad">
+      <freejoint/>
+      <camera name="track" pos="-1 0 0.5" xyaxes="0 -1 0 1 0 2" mode="trackcom"/>
+      <!-- Define an IMU site -->
+      <site name="imu" pos="0 0 0.02"/>
+      <!-- Visual representation of the quadrotor body -->
+      <geom type="box" size="0.1 0.1 0.02" pos="0 0 0"/>
+      <!-- Collision geoms (optional, here just for example) -->
+      <geom type="box" size="0.06 0.03 0.02" pos="0.04 0 0.02"/>
+      <geom type="box" size="0.06 0.03 0.02" pos="-0.04 0 0.02"/>
+      
+      <!-- Rotor geometry: symmetric positions (X-configuration) -->
+      <!-- Using an arm length L=0.20, each rotor is placed at (±0.1414, ±0.1414, 0.05) -->
+      <geom name="rotor1" class="rotor" pos="0.1414 0.1414 0.05" mass="0.25"/>
+      <geom name="rotor2" class="rotor" pos="0.1414 -0.1414 0.05" mass="0.25"/>
+      <geom name="rotor3" class="rotor" pos="-0.1414 -0.1414 0.05" mass="0.25"/>
+      <geom name="rotor4" class="rotor" pos="-0.1414 0.1414 0.05" mass="0.25"/>
+      
+      <!-- Thrust sites at the same positions as the rotors -->
+      <site name="thrust1" pos="0.1414 0.1414 0.05" size="0.01"/>
+      <site name="thrust2" pos="0.1414 -0.1414 0.05" size="0.01"/>
+      <site name="thrust3" pos="-0.1414 -0.1414 0.05" size="0.01"/>
+      <site name="thrust4" pos="-0.1414 0.1414 0.05" size="0.01"/>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <!-- Motor actuators: assign gear values so that rotor1 and rotor3 have one sign and rotor2 and rotor4 the opposite sign. -->
+    <motor class="quad" name="thrust1" site="thrust1" gear="0 0 1 0 0 -0.0201"/>
+    <motor class="quad" name="thrust2" site="thrust2" gear="0 0 1 0 0 0.0201"/>
+    <motor class="quad" name="thrust3" site="thrust3" gear="0 0 1 0 0 -0.0201"/>
+    <motor class="quad" name="thrust4" site="thrust4" gear="0 0 1 0 0 0.0201"/>
+  </actuator>
+
+  <sensor>
+    <gyro name="body_gyro" site="imu"/>
+    <accelerometer name="body_linacc" site="imu"/>
+    <framequat name="body_quat" objtype="site" objname="imu"/>
+  </sensor>
+
+  <keyframe>
+    <!-- Hover keyframe: the body is at 0 0 0.3 with a neutral quaternion, and each motor at 3.25 N -->
+    <key name="hover" qpos="0 0 0.3 1 0 0 0" ctrl="3.25 3.25 3.25 3.25"/>
+  </keyframe>
+</mujoco>

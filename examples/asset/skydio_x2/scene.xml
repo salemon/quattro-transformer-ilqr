@@ -1,0 +1,24 @@
+<mujoco model="Skydio X2 scene">
+  <include file="x2.xml"/>
+
+  <statistic center="0 0 0.1" extent="0.6" meansize=".05"/>
+
+  <!-- Disable shadows if supported -->
+  <visual>
+    <headlight/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="-20" elevation="-20" ellipsoidinertia="true"/>
+  </visual>
+
+  <asset>
+    <texture builtin="gradient" height="256" rgb1=".9 .9 1." rgb2=".2 .3 .4" type="skybox" width="256"/>
+    <texture builtin="checker" height="512" name="texplane" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" type="2d" width="512"/>
+    <!-- Set reflectance to 0 to remove reflections -->
+    <material name="groundplane" texture="texplane" texuniform="true" texrepeat="2.5 2.5" reflectance="0"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
+    <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+  </worldbody>
+</mujoco>
