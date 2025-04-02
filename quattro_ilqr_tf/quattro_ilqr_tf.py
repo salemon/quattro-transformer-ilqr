@@ -109,6 +109,8 @@ class iLQR_TF:
         self.max_iter = max_iter
         self.tol = tol
 
+        self.state_offset = np.zeros_like(self.x0)
+
         # Validate tf_window
         if tf_window >= horizon:
             raise ValueError("tf_window must be less than the horizon.")
@@ -600,7 +602,7 @@ class iLQR_TF:
                     K_seq_flat = K_seq_arr.reshape(k_seq_arr.shape[0], dim_u * dim_x)
                     kK_prompt = np.concatenate([k_seq_arr, K_seq_flat], axis=-1)
 
-                    x_seq_err = x_seq.copy() - x_ref
+                    x_seq_err = x_seq.copy() - x_ref + self.state_offset
 
                     # Transformer inference
                     predicted_kK_flat = self.tf.predict(x_seq_err, kK_prompt)
@@ -628,10 +630,7 @@ class iLQR_TF:
                     K_seq_flat = K_seq_arr.reshape(k_seq_arr.shape[0], dim_u * dim_x)
                     kK_prompt = np.concatenate([k_seq_arr, K_seq_flat], axis=-1)
 
-                    # offset = np.zeros_like(x_seq[0])
-                    # offset[2] = 0.5
-                    # x_seq_err = x_seq - x_ref + offset
-                    x_seq_err = x_seq - x_ref
+                    x_seq_err = x_seq - x_ref + self.state_offset
 
                     predicted_kK_flat = self.tf.predict(x_seq_err, kK_prompt)
 
@@ -705,3 +704,9 @@ class iLQR_TF:
                     self.forward_pass_time, self.inference_time)
         else:
             return (self.total_time, self.backward_pass_time, self.forward_pass_time)
+
+    def set_state_offset(self, x_offset):
+        self.state_offset = x_offset
+
+    def get_state_offset(self):
+        return self.state_offset.copy()

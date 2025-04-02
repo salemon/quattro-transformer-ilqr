@@ -9,7 +9,8 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 # Import transformer components from the transformer_model module.
-from transformer_model import TransformerPredictor, DataNormalizer
+# from transformer_model import TransformerPredictor, DataNormalizer
+from .transformer_model import TransformerPredictor, DataNormalizer
 
 ## @package transformer_ilqr
 #  @brief This module defines the TransformerILQR class, which handles dataset creation,
