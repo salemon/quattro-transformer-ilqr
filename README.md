@@ -26,8 +26,8 @@ Real-time optimal control remains challenging in robotics due to the sequential 
 
 ### Dependencies
 - Python 3.12
-- PyTorch
-- MuJoCo
+- PyTorch 2.5.1
+- MuJoCo 3.3.0
 
 ### Installation Steps
 Clone the repository:
@@ -38,7 +38,7 @@ cd quattro-transformer-ilqr
 
 
 ## Usage
-To run experiments or test the Quattro framework, we suggest to start our examples.
+To run experiments or test the Quattro framework, we suggest to start with our examples.
 
 ## Structure
 - `quattro_ilqr_tf/`: The Quattro framework
