@@ -3,7 +3,6 @@ import numpy as np
 import time
 import glfw
 import pickle
-import matplotlib.pyplot as plt
 
 import os
 import sys
@@ -243,8 +242,7 @@ if __name__ == "__main__":
 
     # Load the model
     
-    model_dir = "/Users/justin/PycharmProjects/quattro-transformer-ilqr/examples/quadrotor/" \
-                "dec3_dmodel128_nhead4_ff512_drop0.1_epoch200_promptlen1_616.2k"
+    model_dir = "examples/quadrotor/dec3_dmodel128_nhead4_ff512_drop0.1_epoch200_promptlen1_616.2k"
     model_wrapper.load(model_dir)
 
     # Example: define a sweep of initial conditions.
