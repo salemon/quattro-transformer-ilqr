@@ -51,7 +51,7 @@ Please cite this project if you find it useful:
 @article{wang2025quattro,
   title={Quattro: Transformer-Accelerated Iterative Linear Quadratic Regulator Framework for Fast Trajectory Optimization},
   author={Wang, Yue and Wang, Haoyu and Li, Zhaoxing},
-  journal={arXiv preprint arXiv:202504},
+  journal={arXiv preprint arXiv:2504.01806},
   year={2025}
 }
 ```
