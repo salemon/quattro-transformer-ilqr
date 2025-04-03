@@ -23,17 +23,16 @@ Real-time optimal control remains challenging in robotics due to the sequential 
   - Quadrotor: 17.8×.
 
 ## Installation
+We recommend use virtual environment e.g. `conda`. The project is based on `Python 3.12`.
 
-### Dependencies
-- Python 3.12
-- PyTorch 2.5.1
-- MuJoCo 3.3.0
-
-### Installation Steps
-Clone the repository:
 ```bash
+# (Optional) set up a virtual enviroment 
+# conda create -n yourenv python=3.12 
+# conda activate yourenv
+
 git clone https://github.com/YueWang996/quattro-transformer-ilqr
 cd quattro-transformer-ilqr
+pip install -r requirements.txt
 ```
 
 
@@ -43,7 +42,7 @@ To run experiments or test the Quattro framework, we suggest to start with our e
 ## Structure
 - `quattro_ilqr_tf/`: The Quattro framework
 - `examples/`: Cart-pole and quadrotor simulations are provided as examples
-- `fpga/`: FPGA-related files and customized Transformer accelerator IP.
+- `TODO:fpga/`: FPGA-related files and customized Transformer accelerator IP.
 
 ## Citation
 Please cite this project if you find it useful:
