@@ -3,9 +3,6 @@ import pickle
 import argparse
 import pandas as pd
 
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 from quattro_ilqr_tf.transformer_ilqr import *
 
 
@@ -88,7 +85,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Train Transformer ILQR Model")
     parser.add_argument("--file_path", type=str, default="examples/cartpole/training/combined_ilqr_logs_range_-0.500_0.500_angle_-0.500_0.500.pkl",
                         help="Path to ILQR logs pickle file")
-    parser.add_argument("--prompt_len", type=int, default=200, help="Prompt length")
+    parser.add_argument("--prompt_len", type=int, default=10, help="Prompt length")
     parser.add_argument("--d_model", type=int, default=512, help="Model dimension")
     parser.add_argument("--nhead", type=int, default=8, help="Number of attention heads")
     parser.add_argument("--num_epochs", type=int, default=1, help="Number of training epochs")
@@ -129,7 +126,7 @@ def main():
                                       nhead=args.nhead)
     
     # Save the trained model.
-    model_wrapper.save("qm")
+    model_wrapper.save("cartpole")
     print("Model training complete and saved.", flush=True)
 
 

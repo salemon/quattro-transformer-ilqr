@@ -29,15 +29,21 @@ Real-time optimal control remains challenging in robotics due to the sequential 
   - Quadrotor: 17.8×.
 
 ## Installation
-We recommend use virtual environment e.g. `conda`. The project is based on `Python 3.12`.
+We recommend use virtual environment e.g. `conda`. The project is based on `Python 3.10`.
 
 ```bash
 # (Optional) set up a virtual enviroment 
-conda create -n quattro python=3.12 
+conda create --name quattro python=3.10
 conda activate quattro
 
 git clone https://github.com/YueWang996/quattro-transformer-ilqr
 cd quattro-transformer-ilqr
+
+# Option 1 (recommanded): install the quattro_ilqr_tf directly as a package
+pip install -e .
+
+# Option 2: install the requirements manually and cpoy the framework files 
+# directly into your project
 pip install -r requirements.txt
 ```
 

@@ -300,7 +300,7 @@ if __name__ == "__main__":
     # --------------------------------------------------
     # 2. Configure parallelization and logging
     # --------------------------------------------------
-    num_groups = 10
+    num_groups = 10 # Number of groups/process to split the positions into
     groups = np.array_split(positions_to_try, num_groups)
     flush_interval = 10  # Flush logs to disk every 10 runs
     combine_logs = True  # Whether to combine logs after all runs finish

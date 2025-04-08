@@ -199,6 +199,13 @@ class TransformerILQR:
                     break
             else:
                 print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {total_loss:.6f}")
+        
+        # Store loss history for external plotting if desired.
+        self.train_loss_history = train_loss_history
+        if test_df is not None:
+            self.test_loss_history = test_loss_history
+
+        return self
 
 
     ## @brief Saves the trained model and normalization parameters.
