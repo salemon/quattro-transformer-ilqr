@@ -56,7 +56,7 @@ pip install -r requirements.txt
     - `training_data_collection.py`: Collects simulation data using multi-core processing.
     - `transformer_training.py`: Trains the Transformer ILQR model on local or remote high-performance systems.
     - `transformer_training.ipynb`: Provides a step-by-step Jupyter Notebook guide for training.
-
+  - `quadrotor/`: Runs a quadrotor simulation using `quadrotor_sim.py`.
 - `TODO:hardware/`
   FPGA-related files and customized Transformer accelerator IP.
 
