@@ -1,9 +1,14 @@
-import torch
-import torch.nn as nn
-
+#!/usr/bin/env python3
 ## @package transformer_model
 #  @brief This module defines the transformer model components used for the decoder-only architecture.
 #         It includes the DataNormalizer, PositionalEncoding, and TransformerPredictor classes.
+#
+#  @author Yue Wang
+#  @license MIT
+
+import torch
+import torch.nn as nn
+
 
 ## @class DataNormalizer
 #  @brief A class to normalize data using mean and standard deviation.

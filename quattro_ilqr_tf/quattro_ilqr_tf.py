@@ -1,26 +1,19 @@
 #!/usr/bin/env python3
-"""
-quattro_ilqr_tf: A Hybrid iLQR and Transformer-based Optimization Framework
-
-Author: Your Name
-License: MIT
-"""
+## @package quattro_ilqr_tf
+#  @brief A Hybrid iLQR and Transformer-based Optimization Framework.
+#
+#  @author Yue Wang
+#  @license MIT
 
 import time
 import functools
 import numpy as np
 
 
+## @brief Decorator factory that records the runtime of a method in a named list attribute on the instance.
+#  @param record_attr_name Name of the list attribute on the instance to store timings.
+#  @return A decorator that appends execution time to the specified instance list.
 def measure_time(record_attr_name):
-    """
-    Decorator factory that records the runtime of a method in a named list attribute on the instance.
-
-    Args:
-        record_attr_name (str): Name of the list attribute on the instance to store timings.
-
-    Returns:
-        decorator (function): Decorator that appends execution time to the specified instance list.
-    """
     def decorator(func):
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
@@ -33,16 +26,10 @@ def measure_time(record_attr_name):
     return decorator
 
 
+## @brief Decorator factory that records the runtime of a function into a provided mutable list.
+#  @param record_list A list to which execution times are appended.
+#  @return A decorator that appends the execution time to record_list.
 def measure_time_with_list(record_list):
-    """
-    Decorator factory that records the runtime of a function into a provided mutable list.
-
-    Args:
-        record_list (list): A list to which execution times are appended.
-
-    Returns:
-        decorator (function): Decorator that appends execution time to record_list.
-    """
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -55,14 +42,27 @@ def measure_time_with_list(record_list):
     return decorator
 
 
+## @class iLQR_TF
+#  @brief A hybrid iLQR and Transformer-based optimization class.
+#
+#  This class implements iterative LQR for trajectory optimization. Optionally, a transformer model
+#  can be used to predict controls within a specified window.
 class iLQR_TF:
-    """
-    A hybrid iLQR and Transformer-based optimization class.
-
-    This class implements iterative LQR for trajectory optimization. Optionally,
-    a transformer model can be used to predict controls within a specified window.
-    """
-
+    ## @brief Constructor for the iLQR_TF class.
+    #  @param dynamics System dynamics function f(x, u) -> x_next.
+    #  @param cost Running cost function L(x, u) -> float.
+    #  @param cost_final Final cost function Lf(x) -> float.
+    #  @param x0 Initial state vector.
+    #  @param u_init Initial control sequence (list of numpy arrays, length = horizon).
+    #  @param horizon Number of time steps in the optimization.
+    #  @param dt Time step size (default: 0.01).
+    #  @param max_iter Maximum number of iLQR iterations (default: 100).
+    #  @param tol Convergence tolerance on cost improvement (default: 1e-3).
+    #  @param tf Transformer model wrapper with a .predict(x_seq, prompt) method (default: None).
+    #  @param tf_window Window size (time steps) for which the Transformer predicts controls.
+    #         Must be less than the horizon (default: 10).
+    #  @param blend_mode If True, iLQR uses both LQR backward pass and Transformer in synergy (default: False).
+    #  @param enable_log If False, iteration logs (self.logs) won't be stored to save memory (default: True).
     def __init__(
         self,
         dynamics,
@@ -79,25 +79,6 @@ class iLQR_TF:
         blend_mode=False,
         enable_log=True
     ):
-        """
-        Initialize iLQR_TF.
-
-        Args:
-            dynamics (callable): System dynamics function f(x, u) -> x_next.
-            cost (callable): Running cost function L(x, u) -> float.
-            cost_final (callable): Final cost function Lf(x) -> float.
-            x0 (np.ndarray): Initial state vector.
-            u_init (list[np.ndarray]): Initial control sequence (length = horizon).
-            horizon (int): Number of time steps in the optimization.
-            dt (float): Time step size.
-            max_iter (int): Maximum number of iLQR iterations.
-            tol (float): Convergence tolerance on cost improvement.
-            tf (object or None): Transformer model wrapper with a .predict(x_seq, prompt) method.
-            tf_window (int): Window size (time steps) for which the Transformer predicts controls.
-                             Must be less than the horizon.
-            blend_mode (bool): If True, iLQR uses both LQR backward pass and Transformer in synergy.
-            enable_log (bool): If False, iteration logs (self.logs) won't be stored to save memory.
-        """
         self.f = dynamics
         self.L = cost
         self.Lf = cost_final
@@ -140,56 +121,32 @@ class iLQR_TF:
             # Decorate the tf.predict method for timing
             self.tf.predict = measure_time_with_list(self.inference_time)(self.tf.predict)
 
-    # -----------------------------------------------------------------------
-    # Public Methods: Simulation, Cost Evaluation, Finite Difference Helpers
-    # -----------------------------------------------------------------------
+    ## @brief Simulate the system forward in time using the current control sequence.
+    #  @param u_seq Control sequence (list of numpy arrays), length equals horizon.
+    #  @return State trajectory as a numpy array of shape (horizon + 1, state_dim).
     def simulate(self, u_seq):
-        """
-        Simulate the system forward in time using the current control sequence.
-
-        Args:
-            u_seq (list[np.ndarray]): Control sequence, length == horizon.
-
-        Returns:
-            x_seq (np.ndarray): State trajectory of shape (horizon + 1, state_dim).
-        """
         x_seq = [self.x0]
         for u in u_seq:
             x_next = self.f(x_seq[-1], u)
             x_seq.append(x_next)
         return np.array(x_seq)
 
+    ## @brief Compute the total cost (running and final) for a given state and control trajectory.
+    #  @param x_seq State trajectory as a numpy array (shape: horizon + 1, state_dim).
+    #  @param u_seq Control sequence (list of numpy arrays) of length horizon.
+    #  @return Total cost over the trajectory as a float.
     def compute_total_cost(self, x_seq, u_seq):
-        """
-        Compute the total cost (running + final) for a given (x_seq, u_seq).
-
-        Args:
-            x_seq (np.ndarray): State trajectory of shape (horizon + 1, state_dim).
-            u_seq (list[np.ndarray]): Control sequence of shape (horizon, control_dim).
-
-        Returns:
-            float: Total cost over the trajectory.
-        """
         cost_val = 0.0
         for t in range(self.horizon):
             cost_val += self.L(x_seq[t], u_seq[t])
         cost_val += self.Lf(x_seq[-1])
         return cost_val
 
-    # ---------------------
-    # Finite Difference Tools
-    # ---------------------
+    ## @brief Compute the gradient of the final cost with respect to state using finite differences.
+    #  @param x State vector (numpy array).
+    #  @param eps Small step for finite differences (default: 1e-5).
+    #  @return Gradient of the final cost Lf(x) as a numpy array.
     def _finite_diff_gradient_final(self, x, eps=1e-5):
-        """
-        Compute gradient of the final cost w.r.t. state x via finite differences.
-
-        Args:
-            x (np.ndarray): State vector.
-            eps (float): Small step for finite differences.
-
-        Returns:
-            grad (np.ndarray): Gradient of Lf(x).
-        """
         grad = np.zeros_like(x)
         for i in range(len(x)):
             x1 = np.copy(x)
@@ -199,17 +156,11 @@ class iLQR_TF:
             grad[i] = (self.Lf(x1) - self.Lf(x2)) / (2 * eps)
         return grad
 
+    ## @brief Compute the Hessian of the final cost with respect to state using finite differences.
+    #  @param x State vector (numpy array).
+    #  @param eps Small step for finite differences (default: 1e-5).
+    #  @return Hessian of the final cost Lf(x) as a numpy array of shape (len(x), len(x)).
     def _finite_diff_hessian_final(self, x, eps=1e-5):
-        """
-        Compute Hessian of the final cost w.r.t. state x via finite differences.
-
-        Args:
-            x (np.ndarray): State vector.
-            eps (float): Small step for finite differences.
-
-        Returns:
-            hess (np.ndarray): Hessian of Lf(x), shape (len(x), len(x)).
-        """
         n = len(x)
         hess = np.zeros((n, n))
         for i in range(n):
@@ -222,21 +173,13 @@ class iLQR_TF:
                               - self.Lf(x_mp) + self.Lf(x_mm)) / (4 * eps ** 2)
         return hess
 
+    ## @brief Compute Jacobians of the system dynamics via finite differences.
+    #  @param x State vector (numpy array).
+    #  @param u Control vector (numpy array).
+    #  @param eps Small step for finite differences (default: 1e-5).
+    #  @return A tuple (A, B) where A is the Jacobian with respect to state (shape: (state_dim, state_dim))
+    #          and B is the Jacobian with respect to control (shape: (state_dim, control_dim)).
     def _compute_dynamics_jacobians(self, x, u, eps=1e-5):
-        """
-        Compute Jacobians of the dynamics (A, B) at a given (x, u) via finite differences.
-
-        A = d f(x,u)/dx,  B = d f(x,u)/du
-
-        Args:
-            x (np.ndarray): State vector.
-            u (np.ndarray): Control vector.
-            eps (float): Small step for finite differences.
-
-        Returns:
-            A (np.ndarray): Jacobian of shape (state_dim, state_dim).
-            B (np.ndarray): Jacobian of shape (state_dim, control_dim).
-        """
         n = x.shape[0]
         m = u.shape[0]
         A = np.zeros((n, n))
@@ -260,18 +203,18 @@ class iLQR_TF:
 
         return A, B
 
+    ## @brief Compute the running cost and its first and second derivatives using finite differences.
+    #  @param x State vector (numpy array).
+    #  @param u Control vector (numpy array).
+    #  @param eps Small step for finite differences (default: 1e-5).
+    #  @return A tuple containing:
+    #          - L_val: the running cost (float),
+    #          - L_x: gradient with respect to state (numpy array),
+    #          - L_u: gradient with respect to control (numpy array),
+    #          - L_xx: second derivative with respect to state (numpy array),
+    #          - L_uu: second derivative with respect to control (numpy array),
+    #          - L_xu: mixed second derivative (numpy array).
     def _compute_cost_derivatives(self, x, u, eps=1e-5):
-        """
-        Compute cost and its derivatives up to second order via finite differences.
-
-        Returns:
-            L_val (float): The running cost at (x, u).
-            L_x  (np.ndarray): Derivative of cost w.r.t. x.
-            L_u  (np.ndarray): Derivative of cost w.r.t. u.
-            L_xx (np.ndarray): Second derivative w.r.t. x.
-            L_uu (np.ndarray): Second derivative w.r.t. u.
-            L_xu (np.ndarray): Mixed second derivative w.r.t. x and u.
-        """
         n = x.shape[0]
         m = u.shape[0]
 
@@ -331,22 +274,12 @@ class iLQR_TF:
 
         return L_val, L_x, L_u, L_xx, L_uu, L_xu
 
-    # ------------------------------
-    # Backward / Forward Pass Methods
-    # ------------------------------
+    ## @brief Perform a standard iLQR backward pass over the entire horizon.
+    #  @param x_seq State trajectory as a numpy array of shape (horizon+1, state_dim).
+    #  @param u_seq Control sequence (list of numpy arrays) of shape (horizon, control_dim).
+    #  @return A tuple (k_seq, K_seq) where k_seq is a list of feedforward terms and K_seq is a list of feedback gains.
     @measure_time("backward_pass_time")
     def backward_pass(self, x_seq, u_seq):
-        """
-        Standard iLQR backward pass over the entire horizon.
-
-        Args:
-            x_seq (np.ndarray): State trajectory of shape (horizon+1, state_dim).
-            u_seq (list[np.ndarray]): Control sequence of shape (horizon, control_dim).
-
-        Returns:
-            k_seq (list[np.ndarray]): Feedforward terms, length = horizon.
-            K_seq (list[np.ndarray]): Feedback gains, length = horizon.
-        """
         x_final = x_seq[-1]
         V_x = self._finite_diff_gradient_final(x_final)
         V_xx = self._finite_diff_hessian_final(x_final)
@@ -385,20 +318,13 @@ class iLQR_TF:
 
         return k_seq, K_seq
 
+    ## @brief Compute a backward pass for a segment of the trajectory from a specified start index.
+    #  @param x_seq Full state trajectory as a numpy array of shape (horizon+1, state_dim).
+    #  @param u_seq Full control sequence (list of numpy arrays) of shape (horizon, control_dim).
+    #  @param start_idx Starting index of the segment.
+    #  @return A tuple (k_seq_seg, K_seq_seg) where k_seq_seg is a list of feedforward terms and K_seq_seg is a list of feedback gains for the segment.
     @measure_time("backward_pass_time")
     def backward_pass_segment(self, x_seq, u_seq, start_idx):
-        """
-        Compute a backward pass over a segment from 'start_idx' to horizon-1.
-
-        Args:
-            x_seq (np.ndarray): Full state trajectory of shape (horizon+1, state_dim).
-            u_seq (list[np.ndarray]): Full control sequence of shape (horizon, control_dim).
-            start_idx (int): Segment start index.
-
-        Returns:
-            k_seq_seg (list[np.ndarray]): Feedforward terms for the segment.
-            K_seq_seg (list[np.ndarray]): Feedback gains for the segment.
-        """
         x_final = x_seq[-1]
         V_x = self._finite_diff_gradient_final(x_final)
         V_xx = self._finite_diff_hessian_final(x_final)
@@ -439,23 +365,16 @@ class iLQR_TF:
 
         return k_seq_seg, K_seq_seg
 
+    ## @brief Perform a standard iLQR forward pass over the entire horizon.
+    #  @param x_seq Previous state trajectory as a numpy array (shape: horizon+1, state_dim).
+    #  @param u_seq Previous control sequence (list of numpy arrays) of shape (horizon, control_dim).
+    #  @param k_seq Feedforward terms (list of numpy arrays) from the backward pass.
+    #  @param K_seq Feedback gains (list of numpy arrays) from the backward pass.
+    #  @param alpha Step size (line search parameter, default: 1.0).
+    #  @return A tuple (new_x_seq, new_u_seq, total_cost) where new_x_seq is the updated state trajectory,
+    #          new_u_seq is the updated control sequence, and total_cost is the cost of the new trajectory.
     @measure_time("forward_pass_time")
     def forward_pass(self, x_seq, u_seq, k_seq, K_seq, alpha=1.0):
-        """
-        Standard iLQR forward pass over the entire horizon.
-
-        Args:
-            x_seq (np.ndarray): State trajectory from previous iteration (horizon+1, state_dim).
-            u_seq (list[np.ndarray]): Control sequence from previous iteration (horizon, control_dim).
-            k_seq (list[np.ndarray]): Feedforward terms from backward pass.
-            K_seq (list[np.ndarray]): Feedback gains from backward pass.
-            alpha (float): Step size (line search parameter).
-
-        Returns:
-            new_x_seq (np.ndarray): Updated state trajectory (horizon+1, state_dim).
-            new_u_seq (list[np.ndarray]): Updated control sequence (horizon, control_dim).
-            total_cost (float): Total cost of the updated trajectory.
-        """
         new_u_seq = []
         new_x_seq = [self.x0]
         for t in range(self.horizon):
@@ -470,24 +389,17 @@ class iLQR_TF:
         total_cost = self.compute_total_cost(new_x_seq, new_u_seq)
         return new_x_seq, new_u_seq, total_cost
 
+    ## @brief Perform a forward pass over a trajectory segment starting from a specified index.
+    #  @param x_seq Full previous state trajectory as a numpy array (shape: horizon+1, state_dim).
+    #  @param u_seq Full previous control sequence (list of numpy arrays) of shape (horizon, control_dim).
+    #  @param k_seq_seg Feedforward terms for the segment (list of numpy arrays).
+    #  @param K_seq_seg Feedback gains for the segment (list of numpy arrays).
+    #  @param start_idx Starting index of the segment.
+    #  @param alpha Step size (line search parameter, default: 1.0).
+    #  @return A tuple (new_x_seq_seg, new_u_seq_seg, seg_cost) where new_x_seq_seg is the updated state sub-trajectory,
+    #          new_u_seq_seg is the updated control sub-sequence, and seg_cost is the total cost of the segment.
     @measure_time("forward_pass_time")
     def forward_pass_segment(self, x_seq, u_seq, k_seq_seg, K_seq_seg, start_idx, alpha=1.0):
-        """
-        Forward pass over a segment from 'start_idx' to horizon-1.
-
-        Args:
-            x_seq (np.ndarray): Full state trajectory from previous iteration (horizon+1, state_dim).
-            u_seq (list[np.ndarray]): Full control sequence from previous iteration (horizon, control_dim).
-            k_seq_seg (list[np.ndarray]): Segment's feedforward terms.
-            K_seq_seg (list[np.ndarray]): Segment's feedback gains.
-            start_idx (int): Segment start index.
-            alpha (float): Step size (line search parameter).
-
-        Returns:
-            new_x_seq_seg (np.ndarray): Updated sub-trajectory of shape (seg_length+1, state_dim).
-            new_u_seq_seg (list[np.ndarray]): Updated sub-control sequence of length seg_length.
-            seg_cost (float): Total cost of the updated segment.
-        """
         new_u_seq_seg = []
         # Starting state is the state at 'start_idx' from x_seq
         new_x_seq_seg = [x_seq.tolist()[start_idx]]
@@ -504,25 +416,12 @@ class iLQR_TF:
         seg_cost = self.compute_total_cost(new_x_seq_seg, new_u_seq_seg)
         return new_x_seq_seg, new_u_seq_seg, seg_cost
 
-    # ---------------------------------
-    # Main Optimization Method
-    # ---------------------------------
+    ## @brief Run the iLQR optimization, optionally integrating a Transformer model.
+    #  @param x_ref Reference state (numpy array) for error-based computations.
+    #  @param verbose Boolean flag to enable verbose output (default: False).
+    #  @return A tuple (u_seq, final_x_seq) where u_seq is the optimized control sequence and final_x_seq is the corresponding state trajectory.
     @measure_time("total_time")
     def optimize(self, x_ref, verbose=False):
-        """
-        Perform the iLQR-based optimization, optionally using a Transformer model.
-
-        If self.tf is None, standard iLQR runs over the entire horizon.
-        Otherwise, the Transformer is used to predict a portion of the controls
-        near the end of the horizon (or merges the Transformer + LQR results if blend_mode=True).
-
-        Args:
-            x_ref (np.ndarray): Reference state for error-based computations (user-defined usage).
-            verbose (bool): If True, prints iteration information.
-
-        Returns:
-            (u_seq, final_x_seq): The optimized control sequence and corresponding state trajectory.
-        """
         # 1) If no transformer provided, run pure iLQR
         if self.tf is None:
             u_seq = self.u
@@ -691,22 +590,23 @@ class iLQR_TF:
             final_x_seq = self.simulate(u_seq)
             return u_seq, final_x_seq
 
+    ## @brief Retrieve timing logs for total optimization time, backward pass, forward pass,
+    #         and inference (if applicable).
+    #  @return A tuple containing timing logs. If a transformer is used, returns (total_time, backward_pass_time,
+    #          forward_pass_time, inference_time); otherwise, returns (total_time, backward_pass_time, forward_pass_time).
     def get_time(self):
-        """
-        Retrieve the timing logs for total, backward pass, forward pass, and (optionally) inference times.
-
-        Returns:
-            tuple: (total_time, backward_pass_time, forward_pass_time[, inference_time])
-                   If self.tf is None, no inference_time list is returned.
-        """
         if self.tf is not None:
             return (self.total_time, self.backward_pass_time,
                     self.forward_pass_time, self.inference_time)
         else:
             return (self.total_time, self.backward_pass_time, self.forward_pass_time)
 
+    ## @brief Set the state offset.
+    #  @param x_offset Offset to be applied to the state trajectory (numpy array).
     def set_state_offset(self, x_offset):
         self.state_offset = x_offset
 
+    ## @brief Get a copy of the current state offset.
+    #  @return Copy of the state offset (numpy array).
     def get_state_offset(self):
         return self.state_offset.copy()

@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+## @package transformer_ilqr
+#  @brief This module defines the TransformerILQR class, which handles dataset creation,
+#         training, saving, loading, and inference for the decoder-only transformer model.
+#
+#  @author Yue Wang
+#  @license MIT
+
 import os
 import datetime
 import numpy as np
@@ -10,10 +18,6 @@ from tqdm import tqdm
 # Import transformer components from the transformer_model module.
 # from transformer_model import TransformerPredictor, DataNormalizer
 from .transformer_model import TransformerPredictor, DataNormalizer
-
-## @package transformer_ilqr
-#  @brief This module defines the TransformerILQR class, which handles dataset creation,
-#         training, saving, loading, and inference for the decoder-only transformer model.
 
 ## @class TransformerILQR
 #  @brief Class for training and using a decoder-only transformer for iLQR problems.
@@ -196,12 +200,6 @@ class TransformerILQR:
             else:
                 print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {total_loss:.6f}")
 
-        # Store loss history for external plotting if desired.
-        self.train_loss_history = train_loss_history
-        if test_df is not None:
-            self.test_loss_history = test_loss_history
-
-        return self
 
     ## @brief Saves the trained model and normalization parameters.
     #  @param base_name Base name for the saved model files.
