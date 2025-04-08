@@ -11,7 +11,7 @@ import mujoco
 # --------------------------------------------------
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from cartpole_mpc import CartPoleMPC
 from quattro_ilqr_tf.transformer_ilqr import *

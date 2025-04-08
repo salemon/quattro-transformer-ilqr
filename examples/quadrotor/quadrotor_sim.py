@@ -262,5 +262,3 @@ if __name__ == "__main__":
         mpc_transformer_model=model_wrapper,
         # mpc_transformer_model=None
     )
-    
-    print(f"Simulation complete. Collected MPC logs from {len(logs)} steps.")

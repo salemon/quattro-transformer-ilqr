@@ -220,5 +220,3 @@ if __name__ == "__main__":
         mpc_transformer_model=transformer_model
     )
     
-    print(f"Collected data from {len(simulation_logs)} runs.")
-    
