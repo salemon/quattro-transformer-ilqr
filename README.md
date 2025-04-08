@@ -1,3 +1,7 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python Version](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/downloads/release/python-310/)
+
+
 # Quattro: Transformer-Accelerated iterative Linear Quadratic Regulator (iLQR)
 
 Quattro is an open-source framework designed to enhance the efficiency of iterative Linear Quadratic Regulators (iLQR) through the innovative integration of Transformer models. By accelerating intermediate computations in iLQR algorithms, Quattro significantly improves real-time optimal control capabilities for nonlinear robotic systems.
@@ -24,51 +28,61 @@ Real-time optimal control remains challenging in robotics due to the sequential 
 - **Algorithm-Level Acceleration**:
 <div align="center"> <img src="figures/cartpole_result.png" alt="Cart-Pole Simulation Result" width="400"/> <p><em>Figure 1: Cart-Pole simulation result using Quattro. Up to 5.3× per iteration.</em></p> </div> <div align="center"> <img src="figures/quadrotor_result.png" alt="Quadrotor Simulation Result" width="400"/> <p><em>Figure 2: Quadrotor simulation result using Quattro. Up to 27× per iteration.</em></p> </div>
 
-- **Overall MPC Speedup**:
+- **Overall MPC Speedup (with Apple Silicon M4 Pro)**:
   - Cart-Pole: 2.8×.
   - Quadrotor: 17.8×.
 
 ## Installation
-We recommend use virtual environment e.g. `conda`. The project is based on `Python 3.10`.
+We recommend use virtual environment e.g. `conda`. The project is based on `Python 3.10` or later versions.
 
 ```bash
-# (Optional) set up a virtual enviroment 
+# Create and activate a new virtual environment
 conda create --name quattro python=3.10
 conda activate quattro
 
+# Clone the repository and navigate to the project folder
 git clone https://github.com/YueWang996/quattro-transformer-ilqr
 cd quattro-transformer-ilqr
 
-# Option 1 (recommanded): install the quattro_ilqr_tf directly as a package
+# Option 1 (Recommended): Install as an editable package
 pip install -e .
 
-# Option 2: install the requirements manually and cpoy the framework files 
-# directly into your project
+# Option 2: Alternatively, install the dependencies manually
 pip install -r requirements.txt
 ```
 
 
 ## Usage
 
-### Project Structure
+### Running Simulations
 
-- `quattro_ilqr_tf/`  
-  The core Quattro framework, including all the model and control implementations.
+Quattro comes with example simulations to illustrate its performance on different robotic systems.
 
-- `examples/`  
-  Contains demonstration simulations and training workflows for cart-pole and quadrotor systems:
-  - `cartpole/`: Runs a cart-pole simulation using `cartpole_sim.py`.
-  - `cartpole/training/`: Includes scripts for data collection and model training.
-    - `training_data_collection.py`: Collects simulation data using multi-core processing.
-    - `transformer_training.py`: Trains the Transformer ILQR model on local or remote high-performance systems.
-    - `transformer_training.ipynb`: Provides a step-by-step Jupyter Notebook guide for training.
-  
-- `TODO:hardware/`
-  FPGA-related files and customized Transformer accelerator IP.
+- **Cart-Pole Simulation:**  
+  Navigate to the `examples/cartpole/` directory and run:
 
-- To generate training data and develop the Transformer model:
-   - Use `training_data_collection.py` from the `examples/cartpole/training` folder to collect simulation logs.
-   - Train the model using `transformer_training.py` or follow the interactive guide in `transformer_training.ipynb`.
+  ```bash
+  python cartpole_sim.py
+  ```
+
+- **Quadrotor Simulation:**  
+  Similarly, navigate to the `examples/quadrotor/` directory and run:
+
+  ```bash
+  python quadrotor_sim.py
+  ```
+
+### Training the Transformer Model
+
+To train the Transformer for iLQR acceleration:
+
+- **Data Collection:**  
+  Use the provided data collection script located at `examples/cartpole/training/training_data_collection.py` to generate simulation logs. This script harnesses multi-core processing for efficiency.
+
+- **Model Training:**  
+  You have two options:
+  - Run `transformer_training.py` from the same directory for script-based training. Suitable to run on a remote server.
+  - Alternatively, use the Jupyter Notebook `transformer_training.ipynb` for an interactive guide.
 
 
 ## Citation
