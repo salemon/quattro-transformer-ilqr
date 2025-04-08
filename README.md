@@ -56,17 +56,11 @@ pip install -r requirements.txt
     - `training_data_collection.py`: Collects simulation data using multi-core processing.
     - `transformer_training.py`: Trains the Transformer ILQR model on local or remote high-performance systems.
     - `transformer_training.ipynb`: Provides a step-by-step Jupyter Notebook guide for training.
-  - `quadrotor/`: Runs a quadrotor simulation using `quadrotor_sim.py`.
+  
 - `TODO:hardware/`
   FPGA-related files and customized Transformer accelerator IP.
 
-### Running Experiments
-
-1. **Start with the Simulations**  
-   Navigate to the `examples/cartpole` directory and run `cartpole_sim.py` to see a demonstration of the system in action.
-
-2. **Data Collection and Training**  
-   To generate training data and develop the Transformer model:
+- To generate training data and develop the Transformer model:
    - Use `training_data_collection.py` from the `examples/cartpole/training` folder to collect simulation logs.
    - Train the model using `transformer_training.py` or follow the interactive guide in `transformer_training.ipynb`.
 
