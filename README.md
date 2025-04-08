@@ -7,7 +7,7 @@
 Quattro is an open-source framework designed to enhance the efficiency of iterative Linear Quadratic Regulators (iLQR) through the innovative integration of Transformer models. By accelerating intermediate computations in iLQR algorithms, Quattro significantly improves real-time optimal control capabilities for nonlinear robotic systems.
 
 <div align="center">
-  <img src="figures/mujoco_quadrotor.png" alt="Cart-pole and Quadrotor Visualization" style="max-width:100%; height:auto;">
+  <img src="figures/mujoco_quadrotor.png" alt="Cart-pole and Quadrotor Visualization" style="max-width:90%; height:auto;">
 </div>
 
 ## Overview
@@ -15,7 +15,7 @@ Quattro is an open-source framework designed to enhance the efficiency of iterat
 Real-time optimal control remains challenging in robotics due to the sequential nature of traditional iLQR methods. Quattro addresses this by employing a Transformer model to concurrently predict feedback and feedforward matrices, allowing parallel computation without sacrificing control accuracy.
 
 <div align="center">
-  <img src="figures/arch-ilqr-tf.png" alt="Architecture Overview" style="max-width:100%; height:auto;">
+  <img src="figures/arch-ilqr-tf.png" alt="Architecture Overview" style="max-width:70%; height:auto;">
 </div>
 
 
