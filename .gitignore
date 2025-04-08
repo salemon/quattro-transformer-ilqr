@@ -173,3 +173,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 examples/quadrotor/.DS_Store
+examples/.DS_Store
+.DS_Store
+.gitignore
+examples/cartpole/dec3_dmodel128_nhead4_ff256_drop0.1_epoch200_promptlen5_402.7k/conversion.py
