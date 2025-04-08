@@ -6,7 +6,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 # Import transformer components from the transformer_model module.
 # from transformer_model import TransformerPredictor, DataNormalizer
@@ -197,16 +196,10 @@ class TransformerILQR:
             else:
                 print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {total_loss:.6f}")
 
-        # Plot training and test loss curves.
-        plt.figure()
-        plt.plot(range(1, len(train_loss_history) + 1), train_loss_history, label="Train Loss")
-        if test_df is not None and test_loss_history:
-            plt.plot(range(1, len(test_loss_history) + 1), test_loss_history, label="Test Loss")
-        plt.xlabel("Epoch")
-        plt.ylabel("Loss")
-        plt.title("Training Loss Curve")
-        plt.legend()
-        plt.show()
+        # Store loss history for external plotting if desired.
+        self.train_loss_history = train_loss_history
+        if test_df is not None:
+            self.test_loss_history = test_loss_history
 
         return self
 
