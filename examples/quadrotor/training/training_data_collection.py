@@ -228,7 +228,7 @@ def run_task(init_conditions, flush_interval, log_filename):
     """
     print(f"Process {os.getpid()}: Running simulation for {len(init_conditions)} initial conditions.", flush=True)
     log_file = run_quadrotor_sim(
-        model_path="./asset/skydio_x2/scene.xml",
+        model_path="examples/asset/skydio_x2/scene.xml",
         use_gui=False,
         sweep_inits=init_conditions,
         sim_steps=2000,
@@ -288,7 +288,7 @@ if __name__ == "__main__":
     print(f"Total initial condition combinations (via LHS): {total_inits}", flush=True)
     
     # Split the initial conditions into groups.
-    num_groups = 400
+    num_groups = 10
     print(f"Splitting initial conditions into {num_groups} groups.", flush=True)
     groups = np.array_split(init_conditions, num_groups)
     
@@ -297,7 +297,9 @@ if __name__ == "__main__":
     print("Starting multiprocessing pool...", flush=True)
     pool = multiprocessing.Pool(processes=num_groups)
     # Each task now returns its log filename.
-    tasks = [(group.tolist(), flush_interval, f"quad_mpc_logs_group_{i}.pkl") for i, group in enumerate(groups)]
+    tasks = [(group.tolist(), flush_interval, f"quad_mpc_logs_group_{i}.pkl")
+         for i, group in enumerate(groups) if len(group) > 0]
+
     group_log_files = pool.starmap(run_task, tasks)
     pool.close()
     pool.join()
