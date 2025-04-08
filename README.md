@@ -1,12 +1,18 @@
 # Quattro: Transformer-Accelerated iterative Linear Quadratic Regulator (iLQR)
 
 Quattro is an open-source framework designed to enhance the efficiency of iterative Linear Quadratic Regulators (iLQR) through the innovative integration of Transformer models. By accelerating intermediate computations in iLQR algorithms, Quattro significantly improves real-time optimal control capabilities for nonlinear robotic systems.
-![Architecture Overview](figures/mujoco_quadrotor.png)
+
+<div align="center">
+  <img src="figures/mujoco_quadrotor.png" alt="Cart-pole and Quadrotor Visualization" style="max-width:100%; height:auto;">
+</div>
 
 ## Overview
+
 Real-time optimal control remains challenging in robotics due to the sequential nature of traditional iLQR methods. Quattro addresses this by employing a Transformer model to concurrently predict feedback and feedforward matrices, allowing parallel computation without sacrificing control accuracy.
 
-![Architecture Overview](figures/arch-ilqr-tf.png)
+<div align="center">
+  <img src="figures/arch-ilqr-tf.png" alt="Architecture Overview" style="max-width:100%; height:auto;">
+</div>
 
 
 ## Key Contributions
@@ -27,8 +33,8 @@ We recommend use virtual environment e.g. `conda`. The project is based on `Pyth
 
 ```bash
 # (Optional) set up a virtual enviroment 
-# conda create -n yourenv python=3.12 
-# conda activate yourenv
+conda create -n quattro python=3.12 
+conda activate quattro
 
 git clone https://github.com/YueWang996/quattro-transformer-ilqr
 cd quattro-transformer-ilqr
