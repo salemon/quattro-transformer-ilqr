@@ -18,7 +18,7 @@ from quattro_ilqr_tf.transformer_ilqr import *
 
 
 def run_cartpole_sim(
-    model_path: str = "./asset/cartpole.xml",
+    model_path: str = "../../asset/cart_pole/cartpole.xml",
     use_gui: bool = True,
     sweep_positions: np.ndarray = None,
     sweep_angles: np.ndarray = None,
